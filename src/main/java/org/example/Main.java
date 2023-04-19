@@ -14,7 +14,7 @@ import java.io.IOException;
 public class Main {
     public static class TokenizerMapper extends Mapper<Object, Text, Text, Text> {
         private DataParser dataParser;
-        int targetYear = 2020;
+        int targetYear = 2019;
         String targetState = "washington";
 
 
@@ -52,24 +52,24 @@ public class Main {
         }
     }
 
-//    public static class MyPartitinoer extends Partitioner<Text, IntWritable> {
-//        @Override
-//        public int getPartition(Text key, Text value, int numPartitions) {
-//            // There's 5 types of property within the dataset, partition will be based on propertyTypeId.
-//            int propertyTypeId = Integer.parseInt(key.toString());
-//            if(propertyTypeId == 3){
-//                return 0;
-//            } else if (propertyTypeId == 4){
-//                return 1;
-//            } else if (propertyTypeId == 6){
-//                return 2;
-//            } else if (propertyTypeId == 13){
-//                return 3;
-//            } else {
-//                return  4;
-//            }
-//        }
-//    }
+    public static class MyPartitinoer extends Partitioner<Text, Text> {
+        @Override
+        public int getPartition(Text key, Text value, int numPartitions) {
+            // There's 5 types of property within the dataset, partition will be based on propertyTypeId.
+            int propertyTypeId = Integer.parseInt(value.toString());
+            if(propertyTypeId == 3){
+                return 0;
+            } else if (propertyTypeId == 4){
+                return 1;
+            } else if (propertyTypeId == 6){
+                return 2;
+            } else if (propertyTypeId == 13){
+                return 3;
+            } else {
+                return  4;
+            }
+        }
+    }
 
     public static class FlightReducer extends
             Reducer<Text, Text, Text, Text> {
@@ -119,7 +119,7 @@ public class Main {
         Job job = new Job(conf, "Percentages of each property type");
         job.setJarByClass(Main.class);
         job.setMapperClass(TokenizerMapper.class);
-//        job.setPartitionerClass(MyPartitinoer.class);
+        job.setPartitionerClass(MyPartitinoer.class);
         job.setReducerClass(FlightReducer.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
